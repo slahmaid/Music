@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>UNDO. | The Anti-Platform</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrambleTextPlugin.min.js"></script>
+
+    <style>
+        /* --- FONTS & VARS --- */
+        @import url("https://fonts.googleapis.com/css2?family=Anton&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+        @font-face { font-family: "PP Supply Mono"; src: url("https://assets.codepen.io/7558/PPSupplyMono-Variable.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+
+        :root {
+          --color-foreground: rgb(250, 225, 250);
+          --color-background: rgb(5, 5, 5);
+          --color-accent: rgb(255, 223, 0);
+          --color-highlight: #E50914;
+          --font-primary: "PP Supply Mono", monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            background-color: #050505;
+            overscroll-behavior: none;
+            font-family: "Poppins", sans-serif;
+            overflow: hidden;
+        }
+
+        /* --- VIEW TRANSITIONS --- */
+        #landing-view { opacity: 1; transition: opacity 0.8s ease-in-out; }
+        #vault-view {
+            opacity: 0; pointer-events: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 999; background-color: var(--color-background); display: none;
+        }
+        #vault-view.active { display: block; pointer-events: auto; }
+
+        /* --- LANDING PAGE --- */
+        .landing-h1 { font-family: "Anton", sans-serif; font-size: 10vw; font-weight: 400; text-transform: uppercase; line-height: 0.9; letter-spacing: -2px; padding-top: 0.25rem; }
+        .landing-h2 { font-family: "Poppins", sans-serif; font-size: 2.5rem; font-weight: 700; line-height: 1.1; }
+        .landing-p { font-family: "Poppins", sans-serif; font-size: 1.1rem; font-weight: 500; }
+        .landing-img { width: 100%; height: 100%; object-fit: cover; user-select: none; pointer-events: none; filter: saturate(1.1) contrast(1.1); }
+        .container { position: fixed; top: 0; left: 0; width: 100vw; height: 100svh; overflow: hidden; touch-action: none; }
+        .progress-bar { position: fixed; top: 0; left: 0; width: 100vw; height: 6px; transform: scaleX(0%); transform-origin: center left; background-color: #ff0000; will-change: transform; z-index: 100; }
+        .progress-counter { position: fixed; bottom: 1rem; right: 6rem; color: #fff; z-index: 100; text-shadow: 5px 5px 15px rgb(0 0 0 / 50%); mix-blend-mode: difference; }
+        
+        .sidebar { position: fixed; top: 0; right: 0; width: 4rem; height: 100vh; display: flex; justify-content: center; align-items: center; z-index: 200; pointer-events: none; transition: all 0.3s ease; }
+        .discover-btn { pointer-events: auto; background: transparent; border: none; color: #fff; font-family: "Anton", sans-serif; font-weight: 400; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; transform: rotate(-90deg); white-space: nowrap; mix-blend-mode: difference; transition: opacity 0.3s ease; }
+        .discover-btn:hover { opacity: 0.5; }
+
+        .scroller { position: relative; height: 100svh; display: flex; will-change: transform; transform: translateX(0); }
+        section { position: relative; height: 100svh; display: flex; justify-content: center; align-items: center; flex-shrink: 0; }
+        .intro, .hero-img, .about, .banner-img, .story, .outro { width: 90vw; } .header, .concept-img { width: 100vw; }
+        .intro { padding: 2rem; background-color: #0a0a0a; color: #f6f6f6; }
+        .header { padding: 2rem; background-color: #E50914; color: #000; }
+        .about { padding: 4rem 3rem 1rem 2rem; background-color: #C8A278; color: #2a2a2a; }
+        .story { padding: 4rem 2rem 2rem 2rem; background-color: #1c1c1c; color: #fff; }
+        .outro { background-color: #fff; color: #000; padding: 2rem; }
+        .about, .intro, .header, .story { display: flex; justify-content: space-between; align-items: flex-start; }
+        .intro, .about, .story { flex-direction: column; }
+        .header .landing-h1 { font-size: 11vw; } .story .landing-h1 { padding-top: 0; color: #E50914; }
+        .about .row { display: flex; justify-content: space-between; width: 100%; height: 100%; }
+        .about .row p { width: 45%; margin-bottom: 1rem; }
+        .about .row .copy { flex: 3; display: flex; flex-direction: column; justify-content: center; }
+        .about .row .img { flex: 3; aspect-ratio: 7/5; margin-left: 2rem; }
+
+        /* --- VAULT (PORTFOLIO) STYLES --- */
+        #vault-view::after { content: ""; position: absolute; top: 0; left: 0; height: 100%; width: 100%; background-image: repeating-linear-gradient(transparent, transparent 2px, #ffffff0d 4px); background-size: auto 100%; pointer-events: none; z-index: -1; }
+        .portfolio-container::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--color-background); background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 250 250' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='4' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E"); opacity: 0.3; z-index: 100; pointer-events: none; mix-blend-mode: overlay; }
+        
+        .portfolio-container { display: flex; flex-direction: column; gap: 0; width: 100vw; padding: 0 2rem; position: relative; counter-reset: project-counter 0; margin-top: 80px; height: 100vh; overflow-y: auto; }
+        .project-list { list-style: none; margin: 0; padding: 0; padding-bottom: 10rem; }
+        
+        /* Desktop Grid */
+        .project-item { cursor: pointer; width: 100%; display: grid; grid-template-columns: 40px 50px 1fr 2fr 1fr 1fr 80px; grid-column-gap: 1.5rem; padding: 12px 0; align-items: center; border-bottom: 1px solid rgba(200, 255, 200, 0.1); transition: all 0.3s ease; opacity: 1; position: relative; }
+        .project-item.active { opacity: 1; box-shadow: inset 0 1px 0 rgba(200, 255, 200, 0.2), inset 0 -1px 0 rgba(200, 255, 200, 0.2); }
+        .project-item.playing .project-data { color: var(--color-highlight); text-shadow: 0 0 10px rgba(229, 9, 20, 0.6); }
+        .portfolio-container.has-active .project-item { opacity: 0.3; }
+        .portfolio-container.has-active .project-item.active, .portfolio-container.has-active .project-item.playing { opacity: 1; }
+        
+        .project-item::before { content: counter(project-counter, decimal-leading-zero); counter-increment: project-counter; padding: 4px 0; line-height: 0.8; opacity: 0.6; justify-self: start; z-index: 10; position: relative; font-family: var(--font-primary); transition: opacity 0.1s ease; }
+        .project-item.counter-hidden::before { opacity: 0.05; }
+
+        /* Data & BG */
+        .project-data { font-family: var(--font-primary); position: relative; white-space: nowrap; text-decoration: none; color: var(--color-foreground); z-index: 1; transition: all 0.3s ease; overflow: hidden; text-overflow: ellipsis; line-height: 1; padding: 2px; }
+        .project-data.artist { justify-self: start; font-weight: 700; } .project-data.album { justify-self: start; } .project-data.category { justify-self: start; } .project-data.label { justify-self: start; } .project-data.year { justify-self: end; text-align: right; }
+        .project-data::after { content: ""; position: absolute; top: 0; left: -8px; width: calc(100% + 16px); height: calc(100% - 2px); background: var(--color-accent); transition: transform 0.3s ease; transform: scaleX(0); transform-origin: left; z-index: -1; }
+        .project-item:hover .project-data::after { transform: scaleX(1); }
+        .project-item:hover .project-data { color: rgb(10, 10, 10) !important; }
+        
+        .background-image { position: fixed; top: 50%; left: 50%; width: 800px; height: 600px; transform: translate(-50%, -50%) scale(1); background-size: cover; background-position: center; background-repeat: no-repeat; opacity: 0; transition: opacity 0.6s ease, transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94); z-index: -2; pointer-events: none; }
+
+        /* --- PLAY BUTTONS (LIST) --- */
+        .play-btn { background: transparent; border: 1px solid rgba(250, 225, 250, 0.3); border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; width: 32px; height: 32px; z-index: 20; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); color: var(--color-foreground); }
+        .play-btn:hover { border-color: var(--color-highlight); background: var(--color-highlight); transform: scale(1.1); box-shadow: 0 0 10px rgba(229, 9, 20, 0.4); }
+        .play-icon, .pause-icon { width: 10px; height: 10px; fill: currentColor; pointer-events: none; }
+        .project-item.playing .play-btn { border-color: var(--color-highlight); background: var(--color-highlight); }
+        .project-item.playing .play-icon { display: none; }
+        .project-item:not(.playing) .pause-icon { display: none; }
+        .project-item.playing .pause-icon { display: block; }
+
+        /* --- PLAYER BAR --- */
+        #player-bar { position: fixed; bottom: 0; left: 0; width: 100%; height: 90px; background: rgba(5, 5, 5, 0.95); border-top: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(20px); display: flex; align-items: center; justify-content: space-between; padding: 0 3rem; transform: translateY(100%); transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); z-index: 1000; font-family: var(--font-primary); box-shadow: 0 -10px 40px rgba(0,0,0,0.8); }
+        #player-bar.visible { transform: translateY(0); }
+        .player-info { display: flex; flex-direction: column; gap: 6px; min-width: 200px; cursor: pointer; } /* Clickable for modal on mobile */
+        .player-title { font-weight: 700; color: #fff; font-size: 1rem; letter-spacing: 1px; }
+        .player-artist { font-weight: 400; color: #666; font-size: 0.8rem; text-transform: uppercase;}
+        .player-controls { display: flex; align-items: center; gap: 30px; flex: 1; justify-content: center; }
+        .ctrl-btn { background: none; border: none; cursor: pointer; fill: #fff; width: 24px; height: 24px; opacity: 0.5; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        .ctrl-btn:hover { opacity: 1; transform: scale(1.2); }
+        .ctrl-btn.main-play { width: 56px; height: 56px; background: #fff; border-radius: 50%; display: flex; justify-content: center; align-items: center; opacity: 1; box-shadow: 0 0 20px rgba(255,255,255,0.1); }
+        .ctrl-btn.main-play svg { fill: #000; width: 16px; height: 16px; margin-left: 2px; }
+        .ctrl-btn.main-play .pause-icon { margin-left: 0; }
+        .ctrl-btn.main-play:hover { transform: scale(1.1); background: var(--color-highlight); box-shadow: 0 0 30px rgba(229, 9, 20, 0.5); }
+        .ctrl-btn.main-play:hover svg { fill: #fff; }
+        
+        /* Scrubber (Desktop Bottom Bar) */
+        .scrubber-container { position: absolute; top: -5px; left: 0; width: 100%; height: 10px; cursor: pointer; z-index: 1001; }
+        .scrubber-bg { position: absolute; top: 4px; left: 0; width: 100%; height: 3px; background: #333; pointer-events: none;}
+        .scrubber-progress { position: absolute; top: 4px; left: 0; width: 0%; height: 3px; background: var(--color-highlight); pointer-events: none; box-shadow: 0 0 10px var(--color-highlight); }
+
+        /* --- FULL SCREEN MODAL (MOBILE) --- */
+        #mobile-track-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(5, 5, 5, 0.98); backdrop-filter: blur(15px);
+            z-index: 2000; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
+            padding: 2rem; text-align: center;
+        }
+        #mobile-track-modal.active { opacity: 1; pointer-events: auto; }
+        
+        #close-modal-btn {
+            position: absolute; top: 2rem; right: 2rem;
+            background: none; border: none; color: #fff;
+            font-family: "Anton", sans-serif; font-size: 2rem;
+            cursor: pointer; z-index: 2001;
+        }
+        
+        #modal-img {
+            width: 70vw; height: 70vw; max-width: 400px; max-height: 400px;
+            object-fit: cover; margin-bottom: 2rem;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+        
+        .modal-info { width: 100%; max-width: 400px; }
+        .modal-info h1 { font-family: "Anton", sans-serif; font-size: 2rem; margin: 0 0 0.5rem 0; color: #fff; line-height: 1; }
+        .modal-info h2 { font-family: "PP Supply Mono", monospace; font-size: 1rem; color: var(--color-highlight); margin: 0 0 1.5rem 0; }
+        
+        /* Modal Controls */
+        .modal-controls { display: flex; align-items: center; justify-content: center; gap: 40px; margin-bottom: 2rem; }
+        .modal-scrubber { width: 100%; height: 20px; position: relative; cursor: pointer; margin-bottom: 2rem; }
+        .modal-scrubber-bg { width: 100%; height: 4px; background: #333; position: absolute; top: 8px; left: 0; border-radius: 2px; }
+        .modal-scrubber-fill { width: 0%; height: 4px; background: #fff; position: absolute; top: 8px; left: 0; border-radius: 2px; }
+        .modal-scrubber-thumb { width: 16px; height: 16px; background: #fff; border-radius: 50%; position: absolute; top: 2px; left: 0%; margin-left: -8px; box-shadow: 0 0 10px rgba(255,255,255,0.5); }
+
+        .modal-meta { display: flex; flex-direction: column; gap: 0.5rem; font-family: "PP Supply Mono", monospace; font-size: 0.8rem; color: #555; text-align: left; margin-top: 1rem; border-top: 1px solid #222; padding-top: 1rem;}
+        .modal-meta span { display: flex; justify-content: space-between; }
+        .modal-meta b { color: #888; font-weight: normal; }
+
+        /* --- BACK BUTTON --- */
+        #back-btn {
+            position: fixed; top: 2rem; left: 2rem; z-index: 2000; background: none; border: none; color: var(--color-foreground); font-family: var(--font-primary); font-size: 14px; font-weight: 700; cursor: pointer; text-transform: uppercase; padding: 10px 20px 10px 0; mix-blend-mode: difference; transition: opacity 0.3s ease;
+        }
+        #back-btn:hover { opacity: 0.6; }
+
+        /* --- CORNER UI --- */
+        .corner-elements { position: fixed; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 0; width: 100%; height: 100%; pointer-events: none; padding: 2rem; z-index: 200; }
+        .corner-item { font-family: var(--font-primary); color: var(--color-foreground); font-size: 12px; padding: 8px; pointer-events: auto; }
+        .corner-item a { color: var(--color-foreground); text-decoration: none; } .corner-item a:hover { text-decoration: underline; }
+        .top-right { grid-column: 2 / 3; grid-row: 1 / 2; align-self: start; justify-self: end; } .bottom-left { grid-column: 1 / 2; grid-row: 2 / 3; align-self: end; justify-self: start; } .bottom-right { grid-column: 2 / 3; grid-row: 2 / 3; align-self: end; justify-self: end; }
+        .time-blink { animation: blink 1s steps(1) infinite; } @keyframes blink { 50% { opacity: 0; } }
+
+        /* --- MEDIA QUERIES --- */
+        @media (max-width: 1200px) { .project-item { grid-template-columns: 30px 30px 1fr 1.5fr 0.8fr 0.8fr 60px; grid-column-gap: 1rem; } .background-image { width: 600px; height: 450px; } }
+
+        @media (max-width: 768px) {
+            /* Landing */
+            .progress-counter { right: 1.5rem; bottom: 1.5rem; } .landing-h1 { font-size: 14vw; } .landing-h2 { font-size: 1.5rem; margin-top: 1rem; } .landing-p { font-size: 0.9rem; }
+            .intro, .about, .story, .outro { padding: 1.5rem 1.5rem 6rem 1.5rem; justify-content: center; } .header .landing-h1 { font-size: 16vw; }
+            .about { padding-top: 2rem; } .about .row { flex-direction: column; justify-content: center; } .about .row .copy { flex: 0 0 auto; width: 100%; margin-bottom: 1rem; } .about .row .landing-p { width: 100%; margin-bottom: 0.5rem; } .about .row .img { width: 100%; height: auto; aspect-ratio: 1/1; margin-left: 0; flex: 0 0 auto; } .about .landing-h1 { margin-top: 1rem; font-size: 12vw; } .story .landing-h1 { font-size: 13vw; margin-bottom: 0.5rem; }
+            .sidebar { width: auto; height: auto; top: auto; right: 50%; bottom: 2.5rem; transform: translateX(50%); background: rgba(0,0,0,0.8); padding: 10px 25px; border: 1px solid #333; border-radius: 50px; backdrop-filter: blur(10px); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+            .discover-btn { transform: none; font-size: 14px; letter-spacing: 1px; }
+            /* Portfolio */
+            .portfolio-container { padding: 0 1rem; margin-top: 60px; }
+            .project-item { display: grid; grid-template-columns: 50px 1fr; grid-template-rows: auto auto; grid-column-gap: 15px; grid-row-gap: 4px; align-items: center; padding: 15px 0; }
+            .play-btn { grid-row: 1 / 3; grid-column: 1; width: 45px; height: 45px; }
+            .project-data.artist { grid-row: 1; grid-column: 2; font-size: 1.1rem; align-self: end; }
+            .project-data.album { grid-row: 2; grid-column: 2; font-size: 0.85rem; color: #888; align-self: start; }
+            .project-item::before { display: none; } .project-data:not(.artist):not(.album) { display: none; }
+            .background-image { display: none !important; } /* Force hide on mobile */
+            /* Player Bar */
+            #player-bar { height: 75px; padding: 0 1rem; } .player-info { min-width: auto; flex: 1; overflow: hidden; } .player-title { font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;} .player-artist { display: none; } 
+            .player-controls { gap: 15px; flex: 0 0 auto; } .ctrl-btn { width: 20px; height: 20px; } .ctrl-btn.main-play { width: 45px; height: 45px; } 
+            /* Hide decorative corners on mobile */
+            .corner-elements { display: none; }
+            /* Ensure back button is still visible */
+            #back-btn { top: 1.5rem; left: 1.5rem; padding: 10px; background: rgba(0,0,0,0.5); border-radius: 4px; backdrop-filter: blur(5px);}
+        }
+    </style>
+</head>
+<body>
+
+    <div id="landing-view">
+        <div class="container">
+            <div class="progress-bar"></div>
+            <div class="progress-counter"><h1 class="landing-h1">0</h1></div>
+            <div class="sidebar"><button class="discover-btn" id="unlock-btn">UNLOCK THE VAULT</button></div>
+            <div class="scroller">
+                <section class="intro"><h1 class="landing-h1">F*CK THE ALGORITHM.</h1><h2 class="landing-h2">We don't curate playlists. We curate culture. <br>Welcome to the uncut frequency.</h2></section>
+                <section class="hero-img"><img class="landing-img" src="img/Views.jpg" alt="Drake Views" /></section>
+                <section class="header"><h1 class="landing-h1">THE VIEW FROM THE TOP IS LONELY. <br>WE MAKE IT LOUD.</h1></section>
+                <section class="about"><div class="row"><div class="copy"><p class="landing-p"><strong>THIS ISN'T BACKGROUND NOISE.</strong><br>Mainstream radio is dead. We serve the raw, the lyrical, and the heavy.</p><p class="landing-p">Therapy costs money. This sh*t just costs your soul.</p></div><div class="img"><img class="landing-img" src="img/Mr. Morale.jpg" alt="Mr Morale" /></div></div><h1 class="landing-h1">REAL SPIT ONLY.</h1></section>
+                <section class="banner-img"><img class="landing-img" src="img/Without-Warning.jpg" alt="Without Warning" /></section>
+                <section class="story"><h1 class="landing-h1">NO SKIPS.</h1><h1 class="landing-h1">NO ADS.</h1><h1 class="landing-h1">JUST PURE HEAT.</h1></section>
+                <section class="concept-img"><img class="landing-img" src="img/My Beautiful Dark Twisted Fantasy.jpg" alt="MBDTF" /></section>
+                <section class="outro"><h1 class="landing-h1">JOIN THE CULT.</h1></section>
+            </div>
+        </div>
+    </div>
+
+    <div id="vault-view">
+        <button id="back-btn">← BACK</button>
+
+        <main class="portfolio-container">
+          <h1 class="sr-only" style="display:none;">Music Portfolio</h1>
+          <ul class="project-list" role="list">
+            <li class="project-item" data-image="https://assets.codepen.io/7558/portrait-fashion-001.jpg">
+              <button class="play-btn"><svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><svg class="pause-icon" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg></button>
+              <span class="project-data artist hover-text">DEATH ON THE BALCONY</span><span class="project-data album hover-text">VICE</span><span class="project-data category hover-text">SINGLE</span><span class="project-data label hover-text">SELF RELEASED</span><span class="project-data year hover-text">2023</span>
+            </li>
+            <li class="project-item" data-image="https://assets.codepen.io/7558/portrait-fashion-002.jpg">
+                <button class="play-btn"><svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><svg class="pause-icon" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg></button>
+                <span class="project-data artist hover-text">JIMMY WHOO</span><span class="project-data album hover-text">NIGHTFALL</span><span class="project-data category hover-text">EP</span><span class="project-data label hover-text">DEEP HOUSE</span><span class="project-data year hover-text">2022</span>
+            </li>
+            <li class="project-item" data-image="https://assets.codepen.io/7558/portrait-fashion-003.jpg">
+                <button class="play-btn"><svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><svg class="pause-icon" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg></button>
+                <span class="project-data artist hover-text">HERMANOS GUTIÉRREZ</span><span class="project-data album hover-text">EL BUENO Y EL MALO</span><span class="project-data category hover-text">ALBUM</span><span class="project-data label hover-text">EASY EYE SOUND</span><span class="project-data year hover-text">2022</span>
+            </li>
+            <li class="project-item" data-image="https://assets.codepen.io/7558/portrait-fashion-004.jpg">
+                <button class="play-btn"><svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><svg class="pause-icon" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg></button>
+                <span class="project-data artist hover-text">NEIL FRANCES</span><span class="project-data album hover-text">LINES</span><span class="project-data category hover-text">ALBUM</span><span class="project-data label hover-text">ISKA DHAMD</span><span class="project-data year hover-text">2021</span>
+            </li>
+            <li class="project-item" data-image="https://assets.codepen.io/7558/portrait-fashion-005.jpg">
+                <button class="play-btn"><svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><svg class="pause-icon" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg></button>
+                <span class="project-data artist hover-text">ADDEX</span><span class="project-data album hover-text">MIDNIGHT SESSIONS</span><span class="project-data category hover-text">EP</span><span class="project-data label hover-text">ELECTRONIC</span><span class="project-data year hover-text">2023</span>
+            </li>
+            <li class="project-item" data-image="https://assets.codepen.io/7558/portrait-fashion-006.jpg">
+                <button class="play-btn"><svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><svg class="pause-icon" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg></button>
+                <span class="project-data artist hover-text">BEYHUDE</span><span class="project-data album hover-text">YALNIZLIK</span><span class="project-data category hover-text">SINGLE</span><span class="project-data label hover-text">ALBÜM YAPIM</span><span class="project-data year hover-text">2023</span>
+            </li>
+            <li class="project-item" data-image="https://assets.codepen.io/7558/portrait-fashion-007.jpg">
+                <button class="play-btn"><svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><svg class="pause-icon" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg></button>
+                <span class="project-data artist hover-text">THING</span><span class="project-data album hover-text">SHAPES</span><span class="project-data category hover-text">ALBUM</span><span class="project-data label hover-text">KOMPAKT</span><span class="project-data year hover-text">2021</span>
+            </li>
+          </ul>
+        </main>
+        
+        <div id="mobile-track-modal">
+            <button id="close-modal-btn">✕</button>
+            <img id="modal-img" src="" alt="Track Cover" />
+            <div class="modal-info">
+                <h1 id="modal-title">Track Title</h1>
+                <h2 id="modal-artist">Artist Name</h2>
+                
+                <div class="modal-scrubber" id="modal-scrubber">
+                    <div class="modal-scrubber-bg"></div>
+                    <div class="modal-scrubber-fill"></div>
+                    <div class="modal-scrubber-thumb"></div>
+                </div>
+
+                <div class="modal-controls">
+                    <button class="ctrl-btn" id="modal-prev-btn"><svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg></button>
+                    <button class="ctrl-btn main-play" id="modal-play-btn"><svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><svg class="pause-icon" viewBox="0 0 24 24" style="display:none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg></button>
+                    <button class="ctrl-btn" id="modal-next-btn"><svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg></button>
+                </div>
+
+                <div class="modal-meta">
+                    <span id="modal-label"><b>Label</b> Label</span>
+                    <span id="modal-category"><b>Format</b> Category</span>
+                    <span id="modal-year"><b>Released</b> Year</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="player-bar">
+            <div class="scrubber-container" id="main-scrubber">
+                <div class="scrubber-bg"></div>
+                <div class="scrubber-progress"></div>
+            </div>
+            
+            <div class="player-info" id="player-info-trigger">
+                <span class="player-title">NO TRACK SELECTED</span>
+                <span class="player-artist"></span>
+            </div>
+            <div class="player-controls">
+                <button class="ctrl-btn" id="player-prev-btn"><svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg></button>
+                <button class="ctrl-btn main-play" id="player-main-btn"><svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><svg class="pause-icon" viewBox="0 0 24 24" style="display:none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg></button>
+                <button class="ctrl-btn" id="player-next-btn"><svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg></button>
+            </div>
+        </div>
+
+        <div class="background-image" id="backgroundImage" role="img" aria-hidden="true"></div>
+        <aside class="corner-elements">
+          <nav class="corner-item top-right"><a href="#">Spotify</a> | <a href="#">Email</a> | <a href="#">X</a></nav>
+          <div class="corner-item bottom-left">43.9250° N, 19.5530° E</div><time class="corner-item bottom-right" id="current-time"></time>
+        </aside>
+    </div>
+
+    <script>
+        const CONFIG = { timeZone: "Europe/Zagreb", timeUpdateInterval: 1000 };
+        
+        document.getElementById('unlock-btn').addEventListener('click', () => {
+            const landing = document.getElementById('landing-view');
+            const vault = document.getElementById('vault-view');
+            landing.style.opacity = '0';
+            setTimeout(() => {
+                landing.style.display = 'none';
+                vault.style.display = 'block';
+                vault.offsetHeight; 
+                vault.style.opacity = '1';
+                vault.classList.add('active');
+                if (!window.portfolioInitialized) { window.undoManager = initPortfolio(); window.portfolioInitialized = true; }
+            }, 800);
+        });
+
+        document.getElementById('back-btn').addEventListener('click', () => {
+            const landing = document.getElementById('landing-view');
+            const vault = document.getElementById('vault-view');
+            if(window.undoManager) window.undoManager.pauseTrack(false);
+            vault.style.opacity = '0';
+            vault.classList.remove('active');
+            setTimeout(() => {
+                vault.style.display = 'none';
+                landing.style.display = 'block';
+                landing.offsetHeight;
+                landing.style.opacity = '1';
+            }, 800);
+        });
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const container = document.querySelector(".container");
+            const scroller = document.querySelector(".scroller");
+            const progressCounter = document.querySelector(".progress-counter h1");
+            const progressBar = document.querySelector(".progress-bar");
+            const sections = Array.from(scroller.querySelectorAll("section"));
+            const isMobile = window.innerWidth <= 768;
+            const touchSensitivity = isMobile ? 3.0 : 2.5; 
+            const bufferSize = 2;
+            let targetScrollX = 0, currentScrollX = 0, isAnimating = false, currentProgressScale = 0, targetProgressScale = 0, lastPercentage = 0;
+            let isDown = false, lastTouchX = 0, touchVelocity = 0, lastTouchTime = 0;
+            const lerp = (start, end, factor) => start + (end - start) * factor;
+
+            const setupScroll = () => {
+                scroller.querySelectorAll(".clone-section").forEach((clone) => clone.remove());
+                const originalSections = Array.from(scroller.querySelectorAll("section:not(.clone-section)"));
+                const templateSections = originalSections.length > 0 ? originalSections : sections;
+                let sequenceWidth = 0;
+                templateSections.forEach((section) => { sequenceWidth += parseFloat(window.getComputedStyle(section).width); });
+                for (let i = -bufferSize; i < 0; i++) { templateSections.forEach((section, index) => { const clone = section.cloneNode(true); clone.classList.add("clone-section"); clone.setAttribute("data-clone-index", `${i}-${index}`); scroller.appendChild(clone); }); }
+                if (originalSections.length === 0) { templateSections.forEach((section, index) => { const clone = section.cloneNode(true); clone.setAttribute("data-clone-index", `0-${index}`); scroller.appendChild(clone); }); }
+                for (let i = 1; i <= bufferSize; i++) { templateSections.forEach((section, index) => { const clone = section.cloneNode(true); clone.classList.add("clone-section"); clone.setAttribute("data-clone-index", `${i}-${index}`); scroller.appendChild(clone); }); }
+                scroller.style.width = `${sequenceWidth * (1 + bufferSize * 2)}px`;
+                targetScrollX = sequenceWidth * bufferSize; currentScrollX = targetScrollX; scroller.style.transform = `translateX(-${currentScrollX}px)`;
+                return sequenceWidth;
+            };
+            const checkBoundaryAndReset = (sequenceWidth) => {
+                if (currentScrollX > sequenceWidth * (bufferSize + 0.5)) { targetScrollX -= sequenceWidth; currentScrollX -= sequenceWidth; scroller.style.transform = `translateX(-${currentScrollX}px)`; return true; }
+                if (currentScrollX < sequenceWidth * (bufferSize - 0.5)) { targetScrollX += sequenceWidth; currentScrollX += sequenceWidth; scroller.style.transform = `translateX(-${currentScrollX}px)`; return true; }
+                return false;
+            };
+            const updateProgress = (sequenceWidth, forceReset = false) => {
+                const basePosition = sequenceWidth * bufferSize; const currentPosition = (currentScrollX - basePosition) % sequenceWidth; let percentage = (currentPosition / sequenceWidth) * 100;
+                if (percentage < 0) percentage = 100 + percentage;
+                const isWrapping = (lastPercentage > 80 && percentage < 20) || (lastPercentage < 20 && percentage > 80) || forceReset;
+                progressCounter.textContent = `${Math.round(percentage)}`; targetProgressScale = percentage / 100;
+                if (isWrapping) { currentProgressScale = targetProgressScale; progressBar.style.transform = `scaleX(${currentProgressScale})`; }
+                lastPercentage = percentage;
+            };
+            const animate = (sequenceWidth, forceProgressReset = false) => {
+                currentScrollX = lerp(currentScrollX, targetScrollX, 0.05); scroller.style.transform = `translateX(-${currentScrollX}px)`; updateProgress(sequenceWidth, forceProgressReset);
+                if (!forceProgressReset) { currentProgressScale = lerp(currentProgressScale, targetProgressScale, 0.05); } progressBar.style.transform = `scaleX(${currentProgressScale})`;
+                if (Math.abs(targetScrollX - currentScrollX) > 0.01) { requestAnimationFrame(() => animate(sequenceWidth)); } else { isAnimating = false; }
+            };
+            let sequenceWidth = setupScroll(); updateProgress(sequenceWidth, true); progressBar.style.transform = `scaleX(${currentProgressScale})`;
+            window.addEventListener('resize', () => { sequenceWidth = setupScroll(); });
+            container.addEventListener("wheel", (e) => { if(document.getElementById('landing-view').style.display === 'none') return; e.preventDefault(); targetScrollX += e.deltaY; const needsReset = checkBoundaryAndReset(sequenceWidth); if (!isAnimating) { isAnimating = true; requestAnimationFrame(() => animate(sequenceWidth, needsReset)); } }, { passive: false });
+            container.addEventListener("touchstart", (e) => { if(document.getElementById('landing-view').style.display === 'none') return; isDown = true; lastTouchX = e.touches[0].clientX; lastTouchTime = Date.now(); targetScrollX = currentScrollX; }, { passive: false });
+            container.addEventListener("touchmove", (e) => { if(document.getElementById('landing-view').style.display === 'none' || !isDown) return; e.preventDefault(); const currentTouchX = e.touches[0].clientX; const touchDelta = lastTouchX - currentTouchX; targetScrollX += touchDelta * touchSensitivity; const currentTime = Date.now(); const timeDelta = currentTime - lastTouchTime; if (timeDelta > 0) touchVelocity = (touchDelta / timeDelta) * 15; lastTouchX = currentTouchX; lastTouchTime = currentTime; const needsReset = checkBoundaryAndReset(sequenceWidth); if (!isAnimating) { isAnimating = true; requestAnimationFrame(() => animate(sequenceWidth, needsReset)); } }, { passive: false });
+            container.addEventListener("touchend", () => { isDown = false; if (Math.abs(touchVelocity) > 0.1) { targetScrollX += touchVelocity * 20; const decayVelocity = () => { touchVelocity *= 0.95; if (Math.abs(touchVelocity) > 0.1) { targetScrollX += touchVelocity; const needsReset = checkBoundaryAndReset(sequenceWidth); if (needsReset) updateProgress(sequenceWidth, true); requestAnimationFrame(decayVelocity); } }; requestAnimationFrame(decayVelocity); } });
+        });
+
+        function initPortfolio() {
+            class AnimationManager {
+              constructor() {
+                this.backgroundImage = document.getElementById("backgroundImage");
+                this.projectItems = document.querySelectorAll(".project-item");
+                this.portfolioContainer = document.querySelector(".portfolio-container");
+                
+                // Player Elements
+                this.playerBar = document.getElementById("player-bar");
+                this.playerTitle = document.querySelector(".player-title");
+                this.playerArtist = document.querySelector(".player-artist");
+                this.playerMainBtn = document.getElementById("player-main-btn");
+                this.playerNextBtn = document.getElementById("player-next-btn");
+                this.playerPrevBtn = document.getElementById("player-prev-btn");
+                this.playerInfoTrigger = document.getElementById("player-info-trigger");
+                
+                // Scrubbers
+                this.mainScrubber = document.querySelector(".scrubber-progress");
+                this.mainScrubberContainer = document.getElementById("main-scrubber");
+                
+                // Mobile Modal
+                this.mobileModal = document.getElementById('mobile-track-modal');
+                this.closeModalBtn = document.getElementById('close-modal-btn');
+                this.modalImg = document.getElementById('modal-img');
+                this.modalTitle = document.getElementById('modal-title');
+                this.modalArtist = document.getElementById('modal-artist');
+                this.modalLabel = document.getElementById('modal-label');
+                this.modalCategory = document.getElementById('modal-category');
+                this.modalYear = document.getElementById('modal-year');
+                this.modalPlayBtn = document.getElementById('modal-play-btn');
+                this.modalPrevBtn = document.getElementById('modal-prev-btn');
+                this.modalNextBtn = document.getElementById('modal-next-btn');
+                this.modalScrubberFill = document.querySelector('.modal-scrubber-fill');
+                this.modalScrubberThumb = document.querySelector('.modal-scrubber-thumb');
+                this.modalScrubberContainer = document.getElementById('modal-scrubber');
+
+                // State
+                this.currentActiveIndex = -1; 
+                this.currentPlayingIndex = -1; 
+                this.originalTexts = new Map();
+                this.debounceTimeout = null; 
+                this.idleAnimation = null; 
+                this.isIdle = true; 
+                this.idleTimer = null; 
+                this.progressInterval = null; 
+                this.progressValue = 0;
+                this.isDragging = false;
+                this.activeDragContainer = null; 
+
+                this.projectItems.forEach((item) => { const textElements = item.querySelectorAll(".hover-text"); const texts = Array.from(textElements).map((el) => el.textContent); this.originalTexts.set(item, texts); });
+              }
+
+              initializeAnimations() {
+                this.preloadImages();
+                this.projectItems.forEach((item, index) => { this.addEventListeners(item, index); });
+                const container = document.querySelector(".portfolio-container");
+                container.addEventListener("mouseleave", () => {
+                  if (this.debounceTimeout) { clearTimeout(this.debounceTimeout); }
+                  this.clearActiveStates();
+                  if(this.currentPlayingIndex === -1) { this.hideBackgroundImage(); }
+                  this.startIdleTimer();
+                });
+                this.startIdleTimer();
+                this.initPlayButtons();
+                this.initMainPlayer();
+                this.initMobileModal();
+                this.initScrubbers();
+              }
+              
+              initMobileModal() {
+                  this.closeModalBtn.addEventListener('click', () => { this.mobileModal.classList.remove('active'); });
+                  this.playerInfoTrigger.addEventListener('click', () => {
+                      if(this.currentPlayingIndex !== -1) {
+                          this.updateModalInfo(this.currentPlayingIndex);
+                          this.mobileModal.classList.add('active');
+                      }
+                  });
+              }
+              
+              updateModalInfo(index) {
+                  const item = this.projectItems[index];
+                  this.modalImg.src = item.dataset.image;
+                  this.modalTitle.textContent = item.querySelector('.album').textContent;
+                  this.modalArtist.textContent = item.querySelector('.artist').textContent;
+                  this.modalLabel.innerHTML = `<b>Label</b> ${item.querySelector('.label').textContent}`;
+                  this.modalCategory.innerHTML = `<b>Format</b> ${item.querySelector('.category').textContent}`;
+                  this.modalYear.innerHTML = `<b>Released</b> ${item.querySelector('.year').textContent}`;
+                  this.syncPlayButtonState(true);
+              }
+
+              initMainPlayer() {
+                  this.playerMainBtn.addEventListener('click', () => this.togglePlay());
+                  this.playerNextBtn.addEventListener('click', () => this.playNext());
+                  this.playerPrevBtn.addEventListener('click', () => this.playPrev());
+                  this.modalPlayBtn.addEventListener('click', () => this.togglePlay());
+                  this.modalNextBtn.addEventListener('click', () => this.playNext());
+                  this.modalPrevBtn.addEventListener('click', () => this.playPrev());
+              }
+              
+              togglePlay() {
+                  if(this.currentPlayingIndex !== -1) {
+                      if(this.playerBar.classList.contains('playing')) { this.pauseTrack(true); } 
+                      else { this.playTrack(this.currentPlayingIndex); }
+                  }
+              }
+
+              playTrack(index) {
+                  if (index < 0) index = this.projectItems.length - 1; 
+                  if (index >= this.projectItems.length) index = 0;
+                  this.pauseTrack(false); 
+                  this.currentPlayingIndex = index;
+                  const item = this.projectItems[index];
+                  item.classList.add('playing');
+                  const artist = item.querySelector('.artist').textContent;
+                  const track = item.querySelector('.album').textContent;
+                  this.playerArtist.textContent = artist;
+                  this.playerTitle.textContent = track;
+                  this.playerBar.classList.add('visible');
+                  this.playerBar.classList.add('playing');
+                  this.syncPlayButtonState(true);
+                  this.updateModalInfo(index); 
+                  this.stopIdleAnimation();
+                  this.startProgressSimulation();
+              }
+
+              pauseTrack(keepVisible) {
+                  clearInterval(this.progressInterval);
+                  this.playerBar.classList.remove('playing');
+                  this.syncPlayButtonState(false);
+                  document.querySelectorAll('.project-item').forEach(el => { el.classList.remove('playing'); });
+                  if(keepVisible === false) {
+                      this.playerBar.classList.remove('visible');
+                      this.currentPlayingIndex = -1;
+                      this.hideBackgroundImage(); 
+                  }
+              }
+
+              playNext() { this.progressValue = 0; this.updateScrubberUI(0); this.playTrack(this.currentPlayingIndex + 1); }
+              playPrev() { this.progressValue = 0; this.updateScrubberUI(0); this.playTrack(this.currentPlayingIndex - 1); }
+
+              // --- DRAG FIX ---
+              initScrubbers() {
+                  const handleSeek = (e) => {
+                      if(!this.activeDragContainer) return;
+                      const rect = this.activeDragContainer.getBoundingClientRect();
+                      const clientX = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+                      let x = clientX - rect.left;
+                      let percent = (x / rect.width) * 100;
+                      if(percent < 0) percent = 0; if(percent > 100) percent = 100;
+                      this.progressValue = percent;
+                      this.updateScrubberUI(percent);
+                  };
+
+                  const startDrag = (e, container) => {
+                      this.isDragging = true; 
+                      this.activeDragContainer = container;
+                      handleSeek(e); 
+                  };
+
+                  [this.mainScrubberContainer, this.modalScrubberContainer].forEach(container => {
+                      if(!container) return;
+                      container.addEventListener('mousedown', (e) => startDrag(e, container));
+                      container.addEventListener('touchstart', (e) => startDrag(e, container));
+                  });
+
+                  const moveHandler = (e) => { if(this.isDragging && this.activeDragContainer) handleSeek(e); };
+                  const endHandler = () => { if(this.isDragging) { this.isDragging = false; this.activeDragContainer = null; } };
+
+                  document.addEventListener('mousemove', moveHandler);
+                  document.addEventListener('touchmove', moveHandler, { passive: false });
+                  document.addEventListener('mouseup', endHandler);
+                  document.addEventListener('touchend', endHandler);
+              }
+
+              updateScrubberUI(percent) {
+                  this.mainScrubber.style.width = `${percent}%`;
+                  this.modalScrubberFill.style.width = `${percent}%`;
+                  this.modalScrubberThumb.style.left = `${percent}%`;
+              }
+
+              startProgressSimulation() {
+                  clearInterval(this.progressInterval);
+                  this.progressInterval = setInterval(() => {
+                      if(!this.isDragging) {
+                          this.progressValue += 0.1; 
+                          if(this.progressValue >= 100) { this.progressValue = 0; this.playNext(); }
+                          this.updateScrubberUI(this.progressValue);
+                      }
+                  }, 50);
+              }
+
+              syncPlayButtonState(isPlaying) {
+                  const toggle = (btn) => {
+                      const playIcon = btn.querySelector('.play-icon');
+                      const pauseIcon = btn.querySelector('.pause-icon');
+                      if(isPlaying) { playIcon.style.display = 'none'; pauseIcon.style.display = 'block'; } 
+                      else { playIcon.style.display = 'block'; pauseIcon.style.display = 'none'; }
+                  };
+                  toggle(this.playerMainBtn);
+                  toggle(this.modalPlayBtn);
+              }
+
+              initPlayButtons() {
+                  const playBtns = document.querySelectorAll('.play-btn');
+                  playBtns.forEach((btn, index) => {
+                      btn.addEventListener('click', (e) => {
+                          e.stopPropagation();
+                          const item = btn.closest('.project-item');
+                          const isPlaying = item.classList.contains('playing');
+                          if (!isPlaying) { this.progressValue = 0; this.updateScrubberUI(0); this.playTrack(index); } else { this.pauseTrack(true); }
+                      });
+                  });
+              }
+
+              preloadImages() { this.projectItems.forEach((item) => { const imageUrl = item.dataset.image; if (imageUrl) { const img = new Image(); img.crossOrigin = "anonymous"; img.src = imageUrl; } }); }
+              
+              addEventListeners(item, index) {
+                const textElements = item.querySelectorAll(".hover-text");
+                const imageUrl = item.dataset.image;
+                const originalTexts = this.originalTexts.get(item);
+                
+                const handleMouseEnter = () => {
+                  if(window.innerWidth <= 768) return; 
+                  this.stopIdleAnimation(); this.stopIdleTimer(); this.isIdle = false;
+                  if (this.debounceTimeout) { clearTimeout(this.debounceTimeout); }
+                  if (this.currentActiveIndex === index) return;
+                  this.updateActiveStates(index);
+                  textElements.forEach((element, i) => { gsap.killTweensOf(element); gsap.to(element, { duration: 0.8, scrambleText: { text: originalTexts[i], chars: "qwerty1337h@ck3r", revealDelay: 0.3, speed: 0.4 } }); });
+                  if (imageUrl) { this.showBackgroundImage(imageUrl); }
+                };
+                
+                const handleMouseLeave = () => {
+                  if(window.innerWidth <= 768) return;
+                  this.debounceTimeout = setTimeout(() => { textElements.forEach((element, i) => { gsap.killTweensOf(element); element.textContent = originalTexts[i]; }); }, 50);
+                };
+
+                item.addEventListener('click', (e) => {
+                    if(window.innerWidth <= 768 && !e.target.closest('.play-btn')) {
+                        this.progressValue = 0; this.updateScrubberUI(0); this.playTrack(index);
+                    }
+                });
+
+                item.addEventListener("mouseenter", handleMouseEnter);
+                item.addEventListener("mouseleave", handleMouseLeave);
+              }
+              
+              updateActiveStates(activeIndex) {
+                this.currentActiveIndex = activeIndex;
+                this.portfolioContainer.classList.add("has-active");
+                this.projectItems.forEach((item, index) => { if (index === activeIndex) { item.classList.add("active"); } else { item.classList.remove("active"); } });
+              }
+              clearActiveStates() {
+                this.currentActiveIndex = -1;
+                this.portfolioContainer.classList.remove("has-active");
+                this.projectItems.forEach((item) => {
+                  item.classList.remove("active");
+                  if(!item.classList.contains('playing')) {
+                      const textElements = item.querySelectorAll(".hover-text"); const originalTexts = this.originalTexts.get(item);
+                      textElements.forEach((element, i) => { gsap.killTweensOf(element); element.textContent = originalTexts[i]; });
+                  }
+                });
+                this.startIdleTimer();
+              }
+              showBackgroundImage(imageUrl) {
+                if(window.innerWidth <= 768) return; 
+                this.backgroundImage.style.transition = "none";
+                this.backgroundImage.style.transform = "translate(-50%, -50%) scale(1.2)";
+                this.backgroundImage.style.backgroundImage = `url(${imageUrl})`;
+                this.backgroundImage.style.opacity = "1";
+                requestAnimationFrame(() => { requestAnimationFrame(() => { this.backgroundImage.style.transition = "opacity 0.6s ease, transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)"; this.backgroundImage.style.transform = "translate(-50%, -50%) scale(1.0)"; }); });
+              }
+              hideBackgroundImage() { this.backgroundImage.style.opacity = "0"; }
+              startIdleTimer() { this.stopIdleTimer(); this.idleTimer = setTimeout(() => { if (this.currentActiveIndex === -1 && this.currentPlayingIndex === -1) { this.isIdle = true; this.startIdleAnimation(); } }, 3000); }
+              stopIdleTimer() { if (this.idleTimer) { clearTimeout(this.idleTimer); this.idleTimer = null; } }
+              startIdleAnimation() {
+                if (this.idleAnimation) return;
+                this.idleAnimation = gsap.timeline({ repeat: -1, repeatDelay: 2 });
+                const columnElements = { artists: [...this.projectItems].map((item) => item.querySelector(".artist")), albums: [...this.projectItems].map((item) => item.querySelector(".album")), categories: [...this.projectItems].map((item) => item.querySelector(".category")), labels: [...this.projectItems].map((item) => item.querySelector(".label")), years: [...this.projectItems].map((item) => item.querySelector(".year")) };
+                const totalRows = this.projectItems.length;
+                const columnStartDelay = 0.25; const rowDelay = 0.05; const hideShowGap = totalRows * rowDelay * 0.5;
+                this.projectItems.forEach((item, rowIndex) => { const hideTime = 0 + rowIndex * rowDelay; const showTime = 0 + hideShowGap + rowIndex * rowDelay; this.idleAnimation.call(() => { item.classList.add("counter-hidden"); }, [], hideTime); this.idleAnimation.call(() => { item.classList.remove("counter-hidden"); }, [], showTime); });
+                Object.keys(columnElements).forEach((columnName, columnIndex) => { const elements = columnElements[columnName]; const columnStart = (columnIndex + 1) * columnStartDelay; elements.forEach((element, rowIndex) => { const hideTime = columnStart + rowIndex * rowDelay; this.idleAnimation.to(element, { duration: 0.1, opacity: 0.05, ease: "power2.inOut" }, hideTime); }); elements.forEach((element, rowIndex) => { const showTime = columnStart + hideShowGap + rowIndex * rowDelay; this.idleAnimation.to(element, { duration: 0.1, opacity: 1, ease: "power2.inOut" }, showTime); }); });
+              }
+              stopIdleAnimation() { if (this.idleAnimation) { this.idleAnimation.kill(); this.idleAnimation = null; gsap.set([...document.querySelectorAll(".project-data")], { opacity: 1 }); this.projectItems.forEach((item) => { item.classList.remove("counter-hidden"); }); } }
+            }
+            class TimeDisplay {
+              constructor(elementId) { this.element = document.getElementById(elementId); if (!this.element) { throw new Error(`Element with id '${elementId}' not found.`); } }
+              start() { this.updateDisplay(); setInterval(() => this.updateDisplay(), CONFIG.timeUpdateInterval); }
+              updateDisplay() { const { hours, minutes, dayPeriod } = this.getCurrentTime(); const timeString = `${hours}<span class="time-blink">:</span>${minutes} ${dayPeriod}`; this.element.innerHTML = timeString; }
+              getCurrentTime() { const now = new Date(); const options = { timeZone: CONFIG.timeZone, hour12: true, hour: "numeric", minute: "numeric", second: "numeric" }; const formatter = new Intl.DateTimeFormat("en-US", options); const parts = formatter.formatToParts(now); return { hours: parts.find((part) => part.type === "hour").value, minutes: parts.find((part) => part.type === "minute").value, dayPeriod: parts.find((part) => part.type === "dayPeriod").value }; }
+            }
+            const animationManager = new AnimationManager();
+            animationManager.initializeAnimations();
+            const timeDisplay = new TimeDisplay("current-time");
+            timeDisplay.start();
+            return animationManager;
+        }
+    </script>
+</body>
+</html>
