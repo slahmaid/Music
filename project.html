@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>UNDO. | The Vault</title>
+    
+    <!-- EXTERNAL LIBRARIES -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrambleTextPlugin.min.js"></script>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Note: Added 'active' class to ensure visibility on page load -->
+    <div id="vault-view" class="active" style="display: block; opacity: 0; animation: fadeInPage 0.8s forwards;">
+        <button id="back-btn">← BACK</button>
+
+        <main class="portfolio-container">
+          <h1 class="sr-only" style="display:none;">Music Portfolio</h1>
+          <ul class="project-list" role="list">
+            <!-- TRACK 1: MONEY TREES -->
+            <li class="project-item" 
+                data-image="https://placehold.co/600x600/1a1a1a/eae0d0?text=GKMC"
+                data-spotify="https://open.spotify.com/search/Money%20Trees%20Kendrick%20Lamar"
+                data-youtube="https://www.youtube.com/results?search_query=Money+Trees+Kendrick+Lamar"
+                data-apple="https://music.apple.com/us/search?term=Money%20Trees%20Kendrick%20Lamar">
+              <button class="play-btn listen-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+              </button>
+              <span class="project-data artist hover-text">KENDRICK LAMAR</span><span class="project-data album hover-text">MONEY TREES</span><span class="project-data category hover-text">ALBUM</span><span class="project-data label hover-text">GOOD KID, M.A.A.D CITY</span><span class="project-data year hover-text">2012</span>
+            </li>
+            
+            <!-- TRACK 2: ALL OF THE LIGHTS -->
+            <li class="project-item" 
+                data-image="https://placehold.co/600x600/1a1a1a/eae0d0?text=MBDTF"
+                data-spotify="https://open.spotify.com/search/All%20of%20the%20Lights%20Kanye%20West"
+                data-youtube="https://www.youtube.com/results?search_query=All+of+the+Lights+Kanye+West"
+                data-apple="https://music.apple.com/us/search?term=All%20of%20the%20Lights%20Kanye%20West">
+                <button class="play-btn listen-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                </button>
+                <span class="project-data artist hover-text">KANYE WEST</span><span class="project-data album hover-text">ALL OF THE LIGHTS</span><span class="project-data category hover-text">SINGLE</span><span class="project-data label hover-text">MY BEAUTIFUL DARK TWISTED FANTASY</span><span class="project-data year hover-text">2010</span>
+            </li>
+
+            <!-- TRACK 3: NO ROLE MODELZ -->
+            <li class="project-item" 
+                data-image="https://placehold.co/600x600/1a1a1a/eae0d0?text=FHD"
+                data-spotify="https://open.spotify.com/search/No%20Role%20Modelz%20J.%20Cole"
+                data-youtube="https://www.youtube.com/results?search_query=No+Role+Modelz+J.+Cole"
+                data-apple="https://music.apple.com/us/search?term=No%20Role%20Modelz%20J.%20Cole">
+                <button class="play-btn listen-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                </button>
+                <span class="project-data artist hover-text">J. COLE</span><span class="project-data album hover-text">NO ROLE MODELZ</span><span class="project-data category hover-text">ALBUM</span><span class="project-data label hover-text">2014 FOREST HILLS DRIVE</span><span class="project-data year hover-text">2014</span>
+            </li>
+
+            <!-- TRACK 4: PRAISE THE LORD -->
+            <li class="project-item" 
+                data-image="https://placehold.co/600x600/1a1a1a/eae0d0?text=TESTING"
+                data-spotify="https://open.spotify.com/search/Praise%20the%20Lord%20Asap%20Rocky"
+                data-youtube="https://www.youtube.com/results?search_query=Praise+the+Lord+Asap+Rocky"
+                data-apple="https://music.apple.com/us/search?term=Praise%20the%20Lord%20Asap%20Rocky">
+                <button class="play-btn listen-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                </button>
+                <span class="project-data artist hover-text">A$AP ROCKY</span><span class="project-data album hover-text">PRAISE THE LORD</span><span class="project-data category hover-text">SINGLE</span><span class="project-data label hover-text">TESTING</span><span class="project-data year hover-text">2018</span>
+            </li>
+
+            <!-- TRACK 5: WHAT TO DO? -->
+            <li class="project-item" 
+                data-image="https://placehold.co/600x600/1a1a1a/eae0d0?text=JACKBOYS"
+                data-spotify="https://open.spotify.com/search/What%20to%20Do%20Jackboys"
+                data-youtube="https://www.youtube.com/results?search_query=What+to+Do+Jackboys"
+                data-apple="https://music.apple.com/us/search?term=What%20to%20Do%20Jackboys">
+                <button class="play-btn listen-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                </button>
+                <span class="project-data artist hover-text">JACKBOYS, DON TOLIVER</span><span class="project-data album hover-text">WHAT TO DO?</span><span class="project-data category hover-text">EP</span><span class="project-data label hover-text">JACKBOYS</span><span class="project-data year hover-text">2019</span>
+            </li>
+
+            <!-- TRACK 6: SELF CARE -->
+            <li class="project-item" 
+                data-image="https://placehold.co/600x600/1a1a1a/eae0d0?text=SWIMMING"
+                data-spotify="https://open.spotify.com/search/Self%20Care%20Mac%20Miller"
+                data-youtube="https://www.youtube.com/results?search_query=Self+Care+Mac+Miller"
+                data-apple="https://music.apple.com/us/search?term=Self%20Care%20Mac%20Miller">
+                <button class="play-btn listen-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                </button>
+                <span class="project-data artist hover-text">MAC MILLER</span><span class="project-data album hover-text">SELF CARE</span><span class="project-data category hover-text">SINGLE</span><span class="project-data label hover-text">SWIMMING</span><span class="project-data year hover-text">2018</span>
+            </li>
+
+            <!-- TRACK 7: FAMILY TIES -->
+            <li class="project-item" 
+                data-image="https://placehold.co/600x600/1a1a1a/eae0d0?text=MELODIC+BLUE"
+                data-spotify="https://open.spotify.com/search/Family%20Ties%20Baby%20Keem"
+                data-youtube="https://www.youtube.com/results?search_query=Family+Ties+Baby+Keem"
+                data-apple="https://music.apple.com/us/search?term=Family%20Ties%20Baby%20Keem">
+                <button class="play-btn listen-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                </button>
+                <span class="project-data artist hover-text">BABY KEEM, KENDRICK LAMAR</span><span class="project-data album hover-text">FAMILY TIES</span><span class="project-data category hover-text">SINGLE</span><span class="project-data label hover-text">THE MELODIC BLUE</span><span class="project-data year hover-text">2021</span>
+            </li>
+
+            <!-- TRACK 8: WITHOUT ME -->
+            <li class="project-item" 
+                data-image="https://placehold.co/600x600/1a1a1a/eae0d0?text=EMINEM+SHOW"
+                data-spotify="https://open.spotify.com/search/Without%20Me%20Eminem"
+                data-youtube="https://www.youtube.com/results?search_query=Without+Me+Eminem"
+                data-apple="https://music.apple.com/us/search?term=Without%20Me%20Eminem">
+                <button class="play-btn listen-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                </button>
+                <span class="project-data artist hover-text">EMINEM</span><span class="project-data album hover-text">WITHOUT ME</span><span class="project-data category hover-text">SINGLE</span><span class="project-data label hover-text">THE EMINEM SHOW</span><span class="project-data year hover-text">2002</span>
+            </li>
+          </ul>
+        </main>
+        
+        <!-- Universal Track Details Modal -->
+        <div id="track-details-modal">
+            <button id="close-modal-btn">✕</button>
+            <div class="modal-content">
+                <img id="modal-img" src="" alt="Track Cover" />
+                <div class="modal-info">
+                    <h1 id="modal-title">Track Title</h1>
+                    <h2 id="modal-artist">Artist Name</h2>
+                    
+                    <div class="modal-meta">
+                        <span id="modal-album"><b>Album</b> Name</span>
+                        <span id="modal-category"><b>Format</b> Category</span>
+                        <span id="modal-year"><b>Released</b> Year</span>
+                    </div>
+
+                    <div class="modal-links">
+                        <p>STREAM ON</p>
+                        <div class="link-buttons">
+                            <a href="#" target="_blank" id="link-spotify" class="stream-btn spotify">Spotify</a>
+                            <a href="#" target="_blank" id="link-youtube" class="stream-btn youtube">YouTube</a>
+                            <a href="#" target="_blank" id="link-apple" class="stream-btn apple">Apple Music</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="background-image" id="backgroundImage" role="img" aria-hidden="true"></div>
+        <aside class="corner-elements">
+          <nav class="corner-item top-right"><a href="#">Spotify</a> | <a href="#">Email</a> | <a href="#">X</a></nav>
+          <div class="corner-item bottom-left">43.9250° N, 19.5530° E</div><time class="corner-item bottom-right" id="current-time"></time>
+        </aside>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
