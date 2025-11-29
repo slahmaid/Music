@@ -8,7 +8,8 @@
     <!-- EXTERNAL LIBRARIES -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrambleTextPlugin.min.js"></script>
-
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -16,16 +17,71 @@
     <div id="landing-view">
         <div class="container">
             <div class="progress-bar"></div>
-            <div class="progress-counter"><h1 class="landing-h1">0</h1></div>
-            <div class="sidebar"><button class="discover-btn" id="unlock-btn">UNLOCK THE VAULT</button></div>
+            <div class="progress-counter pin-bottom-right"><h1 class="landing-h1">0</h1></div>
+            <div class="site-logo pin-top-left">UNDO.</div>
+            <div class="sidebar pin-top-right"><button class="discover-btn" id="unlock-btn">UNLOCK THE VAULT</button></div>
             <div class="scroller">
-                <section class="intro"><h1 class="landing-h1">F*CK THE ALGORITHM.</h1><h2 class="landing-h2">We don't curate playlists. We curate culture. <br>Welcome to the uncut frequency.</h2></section>
-                <section class="hero-img"><img class="landing-img" src="img/Views.jpg" alt="Drake Views" onerror="this.src='https://placehold.co/1920x1080/1a1a1a/eae0d0?text=IMAGE+UNAVAILABLE'"/> </section>
-                <section class="header"><h1 class="landing-h1">THE VIEW FROM THE TOP IS LONELY. <br>WE MAKE IT LOUD.</h1></section>
-                <section class="about"><div class="row"><div class="copy"><p class="landing-p"><strong>THIS ISN'T BACKGROUND NOISE.</strong><br>Mainstream radio is dead. We serve the raw, the lyrical, and the heavy.</p><p class="landing-p">Therapy costs money. This sh*t just costs your soul.</p></div><div class="img"><img class="landing-img" src="img/Mr. Morale.jpg" alt="Mr Morale" onerror="this.src='https://placehold.co/800x800/1a1a1a/eae0d0?text=IMAGE+UNAVAILABLE'"/></div></div><h1 class="landing-h1">REAL SPIT ONLY.</h1></section>
-                <section class="banner-img"><img class="landing-img" src="img/Without-Warning.jpg" alt="Without Warning" onerror="this.src='https://placehold.co/1920x1080/1a1a1a/eae0d0?text=IMAGE+UNAVAILABLE'"/> </section>
-                <section class="story"><h1 class="landing-h1">NO SKIPS.</h1><h1 class="landing-h1">NO ADS.</h1><h1 class="landing-h1">JUST PURE HEAT.</h1></section>
-                <section class="concept-img"><img class="landing-img" src="img/My Beautiful Dark Twisted Fantasy.jpg" alt="MBDTF" onerror="this.src='https://placehold.co/1920x1080/1a1a1a/eae0d0?text=IMAGE+UNAVAILABLE'"/> </section>
+                <section class="intro landing-block">
+                    <div class="landing-stack">
+                        <h1 class="landing-h1">F*CK THE ALGORITHM.</h1>
+                        <h2 class="landing-h2">We don't curate playlists. We curate culture. <br>Welcome to the uncut frequency.</h2>
+                    </div>
+                </section>
+                <section class="hero-img">
+                    <img class="landing-img"
+                         src="img/Views-desktop.jpg"
+                         srcset="img/Views-mobile.jpg 900w, img/Views-desktop.jpg 1600w, img/Views.jpg 2400w"
+                         sizes="(max-width: 768px) 100vw, 90vw"
+                         alt="Drake Views"
+                         onerror="this.src='https://placehold.co/1920x1080/1a1a1a/eae0d0?text=IMAGE+UNAVAILABLE'"/>
+                </section>
+                <section class="header landing-block">
+                    <div class="landing-stack">
+                        <h1 class="landing-h1">THE VIEW FROM THE TOP IS LONELY. <br>WE MAKE IT LOUD.</h1>
+                    </div>
+                </section>
+                <section class="about landing-block">
+                    <div class="landing-stack">
+                        <div class="row">
+                            <div class="copy">
+                                <p class="landing-p"><strong>THIS ISN'T BACKGROUND NOISE.</strong><br>Mainstream radio is dead. We serve the raw, the lyrical, and the heavy.</p>
+                                <p class="landing-p">Therapy costs money. This sh*t just costs your soul.</p>
+                            </div>
+                            <div class="img">
+                                <img class="landing-img"
+                                     src="img/Mr.-Morale-desktop.jpg"
+                                     srcset="img/Mr.-Morale-mobile.jpg 900w, img/Mr.-Morale-desktop.jpg 1600w, img/Mr. Morale.jpg 2000w"
+                                     sizes="(max-width: 768px) 100vw, 50vw"
+                                     alt="Mr Morale"
+                                     onerror="this.src='https://placehold.co/800x800/1a1a1a/eae0d0?text=IMAGE+UNAVAILABLE'"/>
+                            </div>
+                        </div>
+                        <h1 class="landing-h1">REAL SPIT ONLY.</h1>
+                    </div>
+                </section>
+                <section class="banner-img">
+                    <img class="landing-img"
+                         src="img/Without-Warning-desktop.jpg"
+                         srcset="img/Without-Warning-mobile.jpg 900w, img/Without-Warning-desktop.jpg 1600w, img/Without-Warning.jpg 2400w"
+                         sizes="(max-width: 768px) 100vw, 90vw"
+                         alt="Without Warning"
+                         onerror="this.src='https://placehold.co/1920x1080/1a1a1a/eae0d0?text=IMAGE+UNAVAILABLE'"/>
+                </section>
+                <section class="story landing-block">
+                    <div class="landing-stack">
+                        <h1 class="landing-h1">NO SKIPS.</h1>
+                        <h1 class="landing-h1">NO ADS.</h1>
+                        <h1 class="landing-h1">JUST PURE HEAT.</h1>
+                    </div>
+                </section>
+                <section class="concept-img">
+                    <img class="landing-img"
+                         src="img/My-Beautiful-Dark-Twisted-Fantasy-desktop.jpg"
+                         srcset="img/My-Beautiful-Dark-Twisted-Fantasy-mobile.jpg 900w, img/My-Beautiful-Dark-Twisted-Fantasy-desktop.jpg 1600w, img/My Beautiful Dark Twisted Fantasy.jpg 2400w"
+                         sizes="(max-width: 768px) 100vw, 90vw"
+                         alt="My Beautiful Dark Twisted Fantasy"
+                         onerror="this.src='https://placehold.co/1920x1080/1a1a1a/eae0d0?text=IMAGE+UNAVAILABLE'"/>
+                </section>
                 
                 <section class="outro">
                     <div class="bell-wrapper">
@@ -55,13 +111,42 @@
                             <span>CLICK HERE</span>
                         </div>
 
-                        <div class="bell-notify-btn" onclick="document.querySelector('.bell-container').classList.toggle('off')">Notify Me</div>
+                        <button class="bell-notify-btn" type="button">Notify Me</button>
                         <div class="grain"></div>
                     </div>
                 </section>
             </div>
         </div>
     </div>
+
+    <div class="newsletter-modal" id="newsletter-modal" aria-hidden="true" role="dialog" aria-labelledby="newsletter-title">
+        <div class="newsletter-backdrop"></div>
+        <div class="newsletter-card">
+            <button class="newsletter-close" id="close-newsletter" aria-label="Close newsletter">×</button>
+            <p class="eyebrow">UNDO. SIGNAL</p>
+            <h2 id="newsletter-title">Newsletter Drop</h2>
+            <p class="newsletter-copy">Raw dispatches, zero fluff. Get new vault unlocks, underground drops, and invites before the feed finds out.</p>
+            <form id="newsletter-form">
+                <label for="newsletter-email">Email address</label>
+                <div class="input-row">
+                    <input type="email" id="newsletter-email" name="email" placeholder="you@email.com" required>
+                    <button type="submit" class="newsletter-submit">Subscribe</button>
+                </div>
+            </form>
+            <p class="newsletter-status" id="newsletter-status" role="status" aria-live="polite"></p>
+        </div>
+    </div>
+
+    <section class="audio-mini-player" aria-live="polite">
+        <button class="player-toggle" aria-label="Toggle preview playback"></button>
+        <div class="player-info">
+            <p class="player-track">Pick a track to preview</p>
+            <p class="player-meta">Listen buttons feed this line.</p>
+        </div>
+        <input class="player-progress" type="range" min="0" max="100" value="0" aria-label="Preview progress">
+        <span class="player-time">0:00</span>
+        <button class="player-close" aria-label="Close preview">×</button>
+    </section>
 
     <script src="script.js"></script>
 </body>

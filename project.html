@@ -8,14 +8,16 @@
     <!-- EXTERNAL LIBRARIES -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrambleTextPlugin.min.js"></script>
-
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <!-- Note: Added 'active' class to ensure visibility on page load -->
     <div id="vault-view" class="active" style="display: block; opacity: 0; animation: fadeInPage 0.8s forwards;">
-        <button id="back-btn">← BACK</button>
+        <div class="site-logo pin-top-left">UNDO.</div>
+        <button id="back-btn" class="pin-top-left pin-offset-secondary">← BACK</button>
 
         <main class="portfolio-container">
           <h1 class="sr-only" style="display:none;">Music Portfolio</h1>
@@ -25,11 +27,18 @@
                 data-image="https://placehold.co/600x600/1a1a1a/eae0d0?text=GKMC"
                 data-spotify="https://open.spotify.com/search/Money%20Trees%20Kendrick%20Lamar"
                 data-youtube="https://www.youtube.com/results?search_query=Money+Trees+Kendrick+Lamar"
-                data-apple="https://music.apple.com/us/search?term=Money%20Trees%20Kendrick%20Lamar">
+                data-apple="https://music.apple.com/us/search?term=Money%20Trees%20Kendrick%20Lamar"
+                data-genre="West Coast Rap"
+                data-description="Sun-baked Compton parable told over a woozy g-funk haze."
+                data-preview="https://cdn.pixabay.com/download/audio/2023/04/07/audio_db3c2a4d2b.mp3?filename=street-fashion-144176.mp3">
               <button class="play-btn listen-btn">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
               </button>
               <span class="project-data artist hover-text">KENDRICK LAMAR</span><span class="project-data album hover-text">MONEY TREES</span><span class="project-data category hover-text">ALBUM</span><span class="project-data label hover-text">GOOD KID, M.A.A.D CITY</span><span class="project-data year hover-text">2012</span>
+              <div class="project-story">
+                <span class="project-genre">West Coast Rap</span>
+                <p>Sun-baked Compton parable told over a woozy g-funk haze.</p>
+              </div>
             </li>
             
             <!-- TRACK 2: ALL OF THE LIGHTS -->
@@ -37,11 +46,18 @@
                 data-image="https://placehold.co/600x600/1a1a1a/eae0d0?text=MBDTF"
                 data-spotify="https://open.spotify.com/search/All%20of%20the%20Lights%20Kanye%20West"
                 data-youtube="https://www.youtube.com/results?search_query=All+of+the+Lights+Kanye+West"
-                data-apple="https://music.apple.com/us/search?term=All%20of%20the%20Lights%20Kanye%20West">
+                data-apple="https://music.apple.com/us/search?term=All%20of%20the%20Lights%20Kanye%20West"
+                data-genre="Maximalist Pop"
+                data-description="Arena-sized horns and heartbreak, stitched together like a runway show."
+                data-preview="https://cdn.pixabay.com/download/audio/2023/05/25/audio_1d515b0b372.mp3?filename=fast-hip-hop-150326.mp3">
                 <button class="play-btn listen-btn">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
                 </button>
                 <span class="project-data artist hover-text">KANYE WEST</span><span class="project-data album hover-text">ALL OF THE LIGHTS</span><span class="project-data category hover-text">SINGLE</span><span class="project-data label hover-text">MY BEAUTIFUL DARK TWISTED FANTASY</span><span class="project-data year hover-text">2010</span>
+                <div class="project-story">
+                    <span class="project-genre">Maximalist Pop</span>
+                    <p>A city-sized fanfare where every horn stab and hook feels cinematic.</p>
+                </div>
             </li>
 
             <!-- TRACK 3: NO ROLE MODELZ -->
@@ -49,11 +65,18 @@
                 data-image="https://placehold.co/600x600/1a1a1a/eae0d0?text=FHD"
                 data-spotify="https://open.spotify.com/search/No%20Role%20Modelz%20J.%20Cole"
                 data-youtube="https://www.youtube.com/results?search_query=No+Role+Modelz+J.+Cole"
-                data-apple="https://music.apple.com/us/search?term=No%20Role%20Modelz%20J.%20Cole">
+                data-apple="https://music.apple.com/us/search?term=No%20Role%20Modelz%20J.%20Cole"
+                data-genre="Conscious Rap"
+                data-description="Cole talks fame fatigue like it’s a late-night diary entry."
+                data-preview="https://cdn.pixabay.com/download/audio/2023/02/28/audio_29032308f5.mp3?filename=chill-abstract-130028.mp3">
                 <button class="play-btn listen-btn">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
                 </button>
                 <span class="project-data artist hover-text">J. COLE</span><span class="project-data album hover-text">NO ROLE MODELZ</span><span class="project-data category hover-text">ALBUM</span><span class="project-data label hover-text">2014 FOREST HILLS DRIVE</span><span class="project-data year hover-text">2014</span>
+                <div class="project-story">
+                    <span class="project-genre">Conscious Rap</span>
+                    <p>A weary monologue about heroes, vices, and the cost of being relatable.</p>
+                </div>
             </li>
 
             <!-- TRACK 4: PRAISE THE LORD -->
@@ -61,11 +84,18 @@
                 data-image="https://placehold.co/600x600/1a1a1a/eae0d0?text=TESTING"
                 data-spotify="https://open.spotify.com/search/Praise%20the%20Lord%20Asap%20Rocky"
                 data-youtube="https://www.youtube.com/results?search_query=Praise+the+Lord+Asap+Rocky"
-                data-apple="https://music.apple.com/us/search?term=Praise%20the%20Lord%20Asap%20Rocky">
+                data-apple="https://music.apple.com/us/search?term=Praise%20the%20Lord%20Asap%20Rocky"
+                data-genre="Bass Gospel"
+                data-description="Flute loops and mosh-pit drums built for basement churches."
+                data-preview="https://cdn.pixabay.com/download/audio/2023/05/18/audio_e4fc52d1e9.mp3?filename=energy-hip-hop-149912.mp3">
                 <button class="play-btn listen-btn">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
                 </button>
                 <span class="project-data artist hover-text">A$AP ROCKY</span><span class="project-data album hover-text">PRAISE THE LORD</span><span class="project-data category hover-text">SINGLE</span><span class="project-data label hover-text">TESTING</span><span class="project-data year hover-text">2018</span>
+                <div class="project-story">
+                    <span class="project-genre">Bass Gospel</span>
+                    <p>A transatlantic cypher that makes spirituality feel like a block party.</p>
+                </div>
             </li>
 
             <!-- TRACK 5: WHAT TO DO? -->
@@ -73,11 +103,18 @@
                 data-image="https://placehold.co/600x600/1a1a1a/eae0d0?text=JACKBOYS"
                 data-spotify="https://open.spotify.com/search/What%20to%20Do%20Jackboys"
                 data-youtube="https://www.youtube.com/results?search_query=What+to+Do+Jackboys"
-                data-apple="https://music.apple.com/us/search?term=What%20to%20Do%20Jackboys">
+                data-apple="https://music.apple.com/us/search?term=What%20to%20Do%20Jackboys"
+                data-genre="Rodeo Rave"
+                data-description="Smoke-stained synths, rooftop anthems, and Don Toliver floating above it all."
+                data-preview="https://cdn.pixabay.com/download/audio/2022/07/23/audio_b789be93fe.mp3?filename=trap-115397.mp3">
                 <button class="play-btn listen-btn">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
                 </button>
                 <span class="project-data artist hover-text">JACKBOYS, DON TOLIVER</span><span class="project-data album hover-text">WHAT TO DO?</span><span class="project-data category hover-text">EP</span><span class="project-data label hover-text">JACKBOYS</span><span class="project-data year hover-text">2019</span>
+                <div class="project-story">
+                    <span class="project-genre">Rodeo Rave</span>
+                    <p>Neon-lit confessionals for speeding through the desert at 3 a.m.</p>
+                </div>
             </li>
 
             <!-- TRACK 6: SELF CARE -->
@@ -85,11 +122,18 @@
                 data-image="https://placehold.co/600x600/1a1a1a/eae0d0?text=SWIMMING"
                 data-spotify="https://open.spotify.com/search/Self%20Care%20Mac%20Miller"
                 data-youtube="https://www.youtube.com/results?search_query=Self+Care+Mac+Miller"
-                data-apple="https://music.apple.com/us/search?term=Self%20Care%20Mac%20Miller">
+                data-apple="https://music.apple.com/us/search?term=Self%20Care%20Mac%20Miller"
+                data-genre="Dreamy Lofi"
+                data-description="Mac exhales over vaporwave keys, still searching for a softer landing."
+                data-preview="https://cdn.pixabay.com/download/audio/2023/06/24/audio_3d90228e0f.mp3?filename=lofi-study-150615.mp3">
                 <button class="play-btn listen-btn">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
                 </button>
                 <span class="project-data artist hover-text">MAC MILLER</span><span class="project-data album hover-text">SELF CARE</span><span class="project-data category hover-text">SINGLE</span><span class="project-data label hover-text">SWIMMING</span><span class="project-data year hover-text">2018</span>
+                <div class="project-story">
+                    <span class="project-genre">Dreamy Lofi</span>
+                    <p>A float session in slow motion—melancholy but stubbornly hopeful.</p>
+                </div>
             </li>
 
             <!-- TRACK 7: FAMILY TIES -->
@@ -97,11 +141,18 @@
                 data-image="https://placehold.co/600x600/1a1a1a/eae0d0?text=MELODIC+BLUE"
                 data-spotify="https://open.spotify.com/search/Family%20Ties%20Baby%20Keem"
                 data-youtube="https://www.youtube.com/results?search_query=Family+Ties+Baby+Keem"
-                data-apple="https://music.apple.com/us/search?term=Family%20Ties%20Baby%20Keem">
+                data-apple="https://music.apple.com/us/search?term=Family%20Ties%20Baby%20Keem"
+                data-genre="Generational Chaos"
+                data-description="Unhinged horn flips where Keem and Kendrick tag-team like luchadores."
+                data-preview="https://cdn.pixabay.com/download/audio/2022/03/15/audio_1eefa93c2e.mp3?filename=late-night-drive-117948.mp3">
                 <button class="play-btn listen-btn">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
                 </button>
                 <span class="project-data artist hover-text">BABY KEEM, KENDRICK LAMAR</span><span class="project-data album hover-text">FAMILY TIES</span><span class="project-data category hover-text">SINGLE</span><span class="project-data label hover-text">THE MELODIC BLUE</span><span class="project-data year hover-text">2021</span>
+                <div class="project-story">
+                    <span class="project-genre">Generational Chaos</span>
+                    <p>The cousin summit where every beat switch feels like a wrestling move.</p>
+                </div>
             </li>
 
             <!-- TRACK 8: WITHOUT ME -->
@@ -109,11 +160,18 @@
                 data-image="https://placehold.co/600x600/1a1a1a/eae0d0?text=EMINEM+SHOW"
                 data-spotify="https://open.spotify.com/search/Without%20Me%20Eminem"
                 data-youtube="https://www.youtube.com/results?search_query=Without+Me+Eminem"
-                data-apple="https://music.apple.com/us/search?term=Without%20Me%20Eminem">
+                data-apple="https://music.apple.com/us/search?term=Without%20Me%20Eminem"
+                data-genre="Cartoon Villainy"
+                data-description="Slim Shady breaking the fourth wall while Detroit drums slap."
+                data-preview="https://cdn.pixabay.com/download/audio/2023/03/13/audio_9c45703657.mp3?filename=retro-hip-hop-136970.mp3">
                 <button class="play-btn listen-btn">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
                 </button>
                 <span class="project-data artist hover-text">EMINEM</span><span class="project-data album hover-text">WITHOUT ME</span><span class="project-data category hover-text">SINGLE</span><span class="project-data label hover-text">THE EMINEM SHOW</span><span class="project-data year hover-text">2002</span>
+                <div class="project-story">
+                    <span class="project-genre">Cartoon Villainy</span>
+                    <p>Saturday-morning chaos set to Marshall’s most playful middle finger.</p>
+                </div>
             </li>
           </ul>
         </main>
@@ -151,6 +209,17 @@
           <div class="corner-item bottom-left">43.9250° N, 19.5530° E</div><time class="corner-item bottom-right" id="current-time"></time>
         </aside>
     </div>
+
+    <section class="audio-mini-player" aria-live="polite">
+        <button class="player-toggle" aria-label="Toggle preview playback"></button>
+        <div class="player-info">
+            <p class="player-track">Pick a track to preview</p>
+            <p class="player-meta">Listen buttons feed this line.</p>
+        </div>
+        <input class="player-progress" type="range" min="0" max="100" value="0" aria-label="Preview progress">
+        <span class="player-time">0:00</span>
+        <button class="player-close" aria-label="Close preview">×</button>
+    </section>
 
     <script src="script.js"></script>
 </body>

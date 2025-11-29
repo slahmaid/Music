@@ -32,6 +32,8 @@ if (backBtn) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+    initNewsletterModal();
+    const audioPlayer = new AudioPreviewPlayer();
     // Initialize Landing Page Scroller ONLY if on landing page
     const scroller = document.querySelector(".scroller");
     if (scroller) {
@@ -88,16 +90,195 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Initialize Portfolio ONLY if on project page
     if (document.querySelector('.portfolio-container')) {
-        window.undoManager = initPortfolio();
+        window.undoManager = initPortfolio(audioPlayer);
     }
 });
 
-function initPortfolio() {
+class AudioPreviewPlayer {
+    constructor() {
+        this.container = document.querySelector('.audio-mini-player');
+        if (!this.container) {
+            this.enabled = false;
+            return;
+        }
+        this.enabled = true;
+        this.audio = new Audio();
+        this.audio.preload = 'auto';
+        this.toggleBtn = this.container.querySelector('.player-toggle');
+        this.closeBtn = this.container.querySelector('.player-close');
+        this.trackEl = this.container.querySelector('.player-track');
+        this.metaEl = this.container.querySelector('.player-meta');
+        this.timeEl = this.container.querySelector('.player-time');
+        this.progress = this.container.querySelector('.player-progress');
+        this.defaultTrack = this.trackEl?.textContent || '';
+        this.defaultMeta = this.metaEl?.textContent || '';
+        this.isScrubbing = false;
+        this.currentSrc = '';
+
+        this.toggleBtn?.addEventListener('click', () => this.toggle());
+        this.closeBtn?.addEventListener('click', () => this.reset());
+        this.progress?.addEventListener('input', (e) => this.handleScrub(e));
+        this.progress?.addEventListener('change', (e) => this.commitScrub(e));
+
+        this.audio.addEventListener('timeupdate', () => this.updateProgress());
+        this.audio.addEventListener('play', () => this.setPlayingState(true));
+        this.audio.addEventListener('pause', () => this.setPlayingState(false));
+        this.audio.addEventListener('ended', () => this.handleEnded());
+    }
+
+    load(meta) {
+        if (!this.enabled || !meta || !meta.src) return;
+        if (this.currentSrc !== meta.src) {
+            this.audio.src = meta.src;
+            this.currentSrc = meta.src;
+        }
+        if (this.trackEl) this.trackEl.textContent = meta.title || 'Untitled Preview';
+        if (this.metaEl) {
+            const details = [meta.genre, meta.description].filter(Boolean).join(" • ");
+            this.metaEl.textContent = details || 'Custom preview loaded';
+        }
+        this.container?.classList.add('active');
+        this.play();
+    }
+
+    play() {
+        if (!this.enabled || !this.currentSrc) return;
+        this.audio.play().catch(() => {});
+    }
+
+    pause() {
+        if (!this.enabled) return;
+        this.audio.pause();
+    }
+
+    toggle() {
+        if (!this.enabled || !this.currentSrc) return;
+        if (this.audio.paused) {
+            this.play();
+        } else {
+            this.pause();
+        }
+    }
+
+    handleScrub(event) {
+        if (!this.enabled || !this.progress || !this.audio.duration) return;
+        this.isScrubbing = true;
+        const percent = Number(event.target.value) / 100;
+        this.timeEl.textContent = this.formatTime(percent * this.audio.duration);
+    }
+
+    commitScrub(event) {
+        if (!this.enabled || !this.progress || !this.audio.duration) return;
+        const percent = Number(event.target.value) / 100;
+        this.audio.currentTime = percent * this.audio.duration;
+        this.isScrubbing = false;
+    }
+
+    updateProgress() {
+        if (!this.enabled || this.isScrubbing || !this.progress || !isFinite(this.audio.duration)) return;
+        const percent = (this.audio.currentTime / this.audio.duration) * 100;
+        this.progress.value = percent || 0;
+        if (this.timeEl) this.timeEl.textContent = this.formatTime(this.audio.currentTime);
+    }
+
+    setPlayingState(isPlaying) {
+        if (!this.enabled || !this.container) return;
+        this.container.classList.toggle('is-playing', isPlaying);
+    }
+
+    handleEnded() {
+        if (!this.enabled) return;
+        this.progress.value = 0;
+        this.timeEl.textContent = '0:00';
+        this.setPlayingState(false);
+    }
+
+    reset() {
+        if (!this.enabled) return;
+        this.pause();
+        this.container?.classList.remove('active', 'is-playing');
+        this.audio.src = '';
+        this.currentSrc = '';
+        if (this.progress) this.progress.value = 0;
+        if (this.trackEl) this.trackEl.textContent = this.defaultTrack;
+        if (this.metaEl) this.metaEl.textContent = this.defaultMeta;
+        if (this.timeEl) this.timeEl.textContent = '0:00';
+    }
+
+    formatTime(time) {
+        const minutes = Math.floor(time / 60) || 0;
+        const seconds = Math.floor(time % 60) || 0;
+        return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+    }
+}
+
+function initNewsletterModal() {
+    const modal = document.getElementById('newsletter-modal');
+    const closeBtn = document.getElementById('close-newsletter');
+    const status = document.getElementById('newsletter-status');
+    const form = document.getElementById('newsletter-form');
+    const hasTrigger = document.querySelector('.bell-notify-btn');
+
+    if (!modal || !hasTrigger) return;
+
+    const openModal = () => {
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('modal-open');
+        if (status) {
+            status.textContent = '';
+            status.classList.remove('visible');
+        }
+    };
+
+    const closeModal = () => {
+        modal.classList.remove('active');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('modal-open');
+    };
+
+    document.addEventListener('click', (event) => {
+        const trigger = event.target.closest('.bell-notify-btn');
+        if (!trigger) return;
+        event.preventDefault();
+        const bell = trigger.closest('.bell-wrapper')?.querySelector('.bell-container');
+        if (bell) bell.classList.remove('off');
+        openModal();
+    });
+
+    closeBtn?.addEventListener('click', closeModal);
+
+    modal.addEventListener('click', (event) => {
+        if (event.target === modal || event.target.classList.contains('newsletter-backdrop')) {
+            closeModal();
+        }
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && modal.classList.contains('active')) {
+            closeModal();
+        }
+    });
+
+    form?.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const email = form.email.value.trim();
+        if (!email) return;
+        if (status) {
+            status.textContent = "You're in. Watch your inbox.";
+            status.classList.add('visible');
+        }
+        form.reset();
+    });
+}
+
+function initPortfolio(previewPlayer) {
     class AnimationManager {
       constructor() {
         this.backgroundImage = document.getElementById("backgroundImage");
         this.projectItems = document.querySelectorAll(".project-item");
         this.portfolioContainer = document.querySelector(".portfolio-container");
+        this.previewPlayer = previewPlayer;
         
         this.currentActiveIndex = -1; 
         this.originalTexts = new Map();
@@ -140,8 +321,9 @@ function initPortfolio() {
           // Item click handlers
           this.projectItems.forEach((item) => {
               item.addEventListener('click', (e) => {
-                  // Check if we clicked the button specifically (optional behavior, depends if user wants separate actions)
-                  // Here we trigger modal on row click as requested
+                  if (e.target.closest('.listen-btn')) {
+                      return;
+                  }
                   
                   const data = {
                       img: item.dataset.image,
@@ -158,7 +340,25 @@ function initPortfolio() {
                   this.populateModal(data);
                   if(modal) modal.classList.add('active');
               });
+
+              const listenBtn = item.querySelector('.listen-btn');
+              if (listenBtn && this.previewPlayer && this.previewPlayer.enabled) {
+                  listenBtn.addEventListener('click', (event) => {
+                      event.stopPropagation();
+                      this.previewPlayer.load(this.getPreviewMeta(item));
+                  });
+              }
           });
+      }
+
+      getPreviewMeta(item) {
+          return {
+              title: item.querySelector('.album')?.textContent || 'Untitled Preview',
+              artist: item.querySelector('.artist')?.textContent || '',
+              genre: item.dataset.genre || '',
+              description: item.dataset.description || '',
+              src: item.dataset.preview || ''
+          };
       }
 
       populateModal(data) {
